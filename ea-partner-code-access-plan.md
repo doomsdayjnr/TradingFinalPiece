@@ -2,7 +2,7 @@
 
 ## Current Decision
 
-Trading Final Piece is ready to move into Phase 1 after the theme reference image and assets are supplied.
+Trading Final Piece has completed Phase 1 and now has the local Phase 2 Supabase foundation scaffolded.
 
 The MVP is an EA access and licensing platform. It is not a copy-trading platform, signal service, managed trading service, education platform, or paid subscription product.
 
@@ -160,6 +160,8 @@ Deliverables:
 ### Phase 2: Supabase Foundation
 
 Goal: Build the backend foundation for auth, account verification, licensing, downloads, support, and analytics.
+
+Status: Local foundation created. The migration still needs to be applied to a live Supabase project.
 
 Tasks:
 
@@ -575,4 +577,3 @@ Protected distribution rule:
 Yes, we are ready for Phase 1 once the theme reference image and asset folder are available.
 
 Phase 1 can start with the homepage, XM funnel, demo-trial CTA, login/register route shell, FAQ, risk disclaimer, and performance-card UI shell. The performance data can be wired fully once the third-party source and backtest data are confirmed.
-
