@@ -1,5 +1,10 @@
 # Production Launch Checklist
 
+For the ordered acceptance tests, expected results, and release criteria, use
+[Project Testing Flow](project-testing-flow.md) and record evidence in
+[Testing Results](testing-results.md). The short checklist below does not replace
+the full test run or verification of the integrated MT4/MT5 binaries.
+
 ## Supabase
 
 - Apply migrations in order:
