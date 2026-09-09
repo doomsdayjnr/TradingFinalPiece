@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { trackFunnelEvent } from "@/lib/analytics/events";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function getFormString(formData: FormData, key: string) {
@@ -28,7 +29,7 @@ export async function register(formData: FormData) {
   const fullName = getFormString(formData, "full_name");
   const supabase = await createSupabaseServerClient();
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -41,6 +42,8 @@ export async function register(formData: FormData) {
   if (error) {
     redirect(`/register?message=${encodeURIComponent(error.message)}`);
   }
+
+  await trackFunnelEvent("site_signup", { email }, data.user?.id ?? null);
 
   redirect("/dashboard");
 }

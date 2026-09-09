@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { TrackedLink } from "./analytics-tracker";
 import { CurrentYear } from "./current-year";
 
 const partnerLink = "https://affs.click/VJMdK";
@@ -186,7 +187,7 @@ export default function Home() {
               ))}
             </div>
             <div className="hero-actions">
-              <a href={partnerLink} className="gold-btn">Get Access To TFP Edge</a>
+              <TrackedLink href={partnerLink} eventName="landing_xm_cta_clicked" className="gold-btn" metadata={{ placement: "hero" }}>Get Access To TFP Edge</TrackedLink>
               <Link href="/register" className="dark-btn">Watch Video</Link>
             </div>
           </div>
@@ -235,7 +236,7 @@ export default function Home() {
               <li>Use partner code <strong>{partnerCode}</strong> when creating your account.</li>
               <li>Submit your account for verification.</li>
             </ul>
-            <a href={partnerLink} className="green-btn">Register With Our Link</a>
+            <TrackedLink href={partnerLink} eventName="landing_xm_cta_clicked" className="green-btn" metadata={{ placement: "access_panel" }}>Register With Our Link</TrackedLink>
           </div>
           <Image className="xm-laptop-art" src="/assets/xm_laptop.png" alt="XM account registration" width={520} height={290} />
         </article>

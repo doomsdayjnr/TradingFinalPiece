@@ -3,6 +3,7 @@
 import crypto from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { trackFunnelEvent } from "@/lib/analytics/events";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -73,6 +74,8 @@ export async function submitBrokerAccount(formData: FormData) {
   if (error) {
     redirect(`/dashboard?message=${encodeURIComponent(error.message)}`);
   }
+
+  await trackFunnelEvent("live_account_submitted", { account_number: accountNumber, platform, broker: "XM" }, user.id);
 
   revalidatePath("/dashboard");
   redirect("/dashboard?message=Account submitted for verification.");
@@ -145,6 +148,8 @@ export async function requestDemoLicense(formData: FormData) {
     redirect(`/dashboard?message=${encodeURIComponent(tokenDisplayError.message)}`);
   }
 
+  await trackFunnelEvent("demo_license_started", { platform, expires_at: demoLicense.expires_at }, user.id);
+
   revalidatePath("/dashboard");
   redirect("/dashboard?message=Demo license created. Your EA token is shown below.");
 }
@@ -177,6 +182,8 @@ export async function createSupportTicket(formData: FormData) {
   if (error) {
     redirect(`/dashboard?message=${encodeURIComponent(error.message)}`);
   }
+
+  await trackFunnelEvent("support_ticket_created", { category, platform: platform || null, account_kind: accountKind || null }, user.id);
 
   revalidatePath("/dashboard");
   redirect("/dashboard?message=Support ticket created.");

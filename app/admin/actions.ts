@@ -3,6 +3,7 @@
 import crypto from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { trackFunnelEvent } from "@/lib/analytics/events";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -114,6 +115,7 @@ export async function approveAccount(formData: FormData) {
   }
 
   await auditLog(adminUser.id, "broker_account.approved", accountId, previousAccount, updatedAccount);
+  await trackFunnelEvent("live_account_approved", { account_id: accountId, platform: updatedAccount.platform }, updatedAccount.user_id);
   revalidatePath("/admin");
   revalidatePath("/dashboard");
   redirect("/admin?message=Account approved and live entitlement created.");
@@ -179,6 +181,9 @@ async function updateAccountStatus(formData: FormData, status: VerificationStatu
   }
 
   await auditLog(adminUser.id, action, accountId, previousAccount, updatedAccount);
+  if (status === "rejected") {
+    await trackFunnelEvent("live_account_rejected", { account_id: accountId, platform: updatedAccount.platform }, updatedAccount.user_id);
+  }
   revalidatePath("/admin");
   revalidatePath("/dashboard");
   redirect(`/admin?message=Account ${status}.`);

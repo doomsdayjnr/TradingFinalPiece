@@ -108,6 +108,7 @@ export default async function AdminPage({ searchParams }: { searchParams?: Searc
           <p>Approve only accounts confirmed in the XM partner dashboard under code R99D9.</p>
         </div>
         <nav>
+          <Link href="/admin/analytics">Analytics</Link>
           <Link href="/admin/tickets">Tickets</Link>
           <Link href="/dashboard">User Portal</Link>
           <Link href="/">Homepage</Link>

@@ -53,6 +53,7 @@ export default async function AdminTicketsPage({ searchParams }: PageProps) {
           <p>Review user support requests and keep status current.</p>
         </div>
         <nav>
+          <Link href="/admin/analytics">Analytics</Link>
           <Link href="/admin">Verification</Link>
           <Link href="/dashboard">User Portal</Link>
           <Link href="/logout">Logout</Link>

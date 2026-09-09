@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { trackFunnelEvent } from "@/lib/analytics/events";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -92,6 +93,8 @@ export async function GET(request: Request) {
       { status: 404 }
     );
   }
+
+  await trackFunnelEvent("ea_download_started", { platform, path: config.path }, userData.user.id);
 
   return NextResponse.redirect(data.signedUrl);
 }

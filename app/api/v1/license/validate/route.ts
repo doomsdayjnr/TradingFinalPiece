@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
+import { trackFunnelEvent } from "@/lib/analytics/events";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type AccountKind = "live" | "demo";
@@ -341,6 +342,7 @@ export async function POST(request: Request) {
       message: "Too many license validation attempts. Please retry shortly."
     };
     await logLicenseCheck(db, request, logPayload, decision);
+    await trackFunnelEvent("license_validation_failed", { result: decision.result, platform, account_type: accountKind });
     return NextResponse.json(decision, { status: 429 });
   }
 
@@ -352,6 +354,7 @@ export async function POST(request: Request) {
       message: "account_number, account_type, platform_type and license_token are required."
     };
     await logLicenseCheck(db, request, logPayload, decision);
+    await trackFunnelEvent("license_validation_failed", { result: decision.result, platform, account_type: accountKind });
     return NextResponse.json(decision, { status: 400 });
   }
 
@@ -363,6 +366,11 @@ export async function POST(request: Request) {
         : await decideDemoAccess(db, { platform, eaProduct, licenseTokenHash });
 
     await logLicenseCheck(db, request, logPayload, decision);
+    await trackFunnelEvent(
+      decision.allowed ? "license_validation_succeeded" : "license_validation_failed",
+      { result: decision.result, platform, account_type: accountKind },
+      decision.user_id
+    );
 
     return NextResponse.json({
       allowed: decision.allowed,
@@ -379,6 +387,7 @@ export async function POST(request: Request) {
     };
 
     await logLicenseCheck(db, request, logPayload, decision);
+    await trackFunnelEvent("license_validation_failed", { result: decision.result, platform, account_type: accountKind });
     return NextResponse.json(decision, { status: 500 });
   }
 }
