@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import { trackFunnelEvent } from "@/lib/analytics/events";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type AccountKind = "live" | "demo";
@@ -40,33 +41,8 @@ type LicenseDecision = {
   license_entitlement_id?: string | null;
 };
 
-const requestWindowMs = 60_000;
-const maxRequestsPerWindow = 60;
-const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
-
-function getClientIp(request: Request) {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "unknown"
-  );
-}
-
 function rateLimitKey(request: Request, accountNumber: string) {
   return `${getClientIp(request)}:${accountNumber || "unknown"}`;
-}
-
-function isRateLimited(key: string) {
-  const now = Date.now();
-  const bucket = rateLimitStore.get(key);
-
-  if (!bucket || bucket.resetAt <= now) {
-    rateLimitStore.set(key, { count: 1, resetAt: now + requestWindowMs });
-    return false;
-  }
-
-  bucket.count += 1;
-  return bucket.count > maxRequestsPerWindow;
 }
 
 function asString(value: unknown) {
@@ -334,7 +310,9 @@ export async function POST(request: Request) {
   const licenseToken = asString(body.license_token);
   const logPayload = { accountNumber, accountKind, platform, brokerName, eaProduct, eaVersion };
 
-  if (isRateLimited(rateLimitKey(request, accountNumber))) {
+  const rateLimit = checkRateLimit(rateLimitKey(request, accountNumber), 60, 60_000);
+
+  if (rateLimit.limited) {
     const decision: LicenseDecision = {
       allowed: false,
       result: "denied_invalid_token",
@@ -343,7 +321,12 @@ export async function POST(request: Request) {
     };
     await logLicenseCheck(db, request, logPayload, decision);
     await trackFunnelEvent("license_validation_failed", { result: decision.result, platform, account_type: accountKind });
-    return NextResponse.json(decision, { status: 429 });
+    return NextResponse.json(decision, {
+      status: 429,
+      headers: {
+        "Retry-After": Math.ceil((rateLimit.resetAt - Date.now()) / 1000).toString()
+      }
+    });
   }
 
   if (!accountNumber || !accountKind || !platform || !licenseToken) {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { trackFunnelEvent } from "@/lib/analytics/events";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -49,6 +50,19 @@ function isEntitlementActive(entitlement: { status: string; expires_at: string |
 
 export async function GET(request: Request) {
   const platform = getPlatform(request);
+  const rateLimit = checkRateLimit(`download:${getClientIp(request)}`, 30, 60_000);
+
+  if (rateLimit.limited) {
+    return NextResponse.json(
+      { error: "Too many download requests. Please retry shortly." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": Math.ceil((rateLimit.resetAt - Date.now()) / 1000).toString()
+        }
+      }
+    );
+  }
 
   if (!platform) {
     return NextResponse.json({ error: "Choose MT4 or MT5." }, { status: 400 });

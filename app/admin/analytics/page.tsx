@@ -101,6 +101,7 @@ export default async function AdminAnalyticsPage() {
         <nav>
           <Link href="/admin">Verification</Link>
           <Link href="/admin/tickets">Tickets</Link>
+          <Link href="/api/health">Health</Link>
           <Link href="/dashboard">User Portal</Link>
         </nav>
       </header>

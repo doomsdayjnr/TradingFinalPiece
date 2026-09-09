@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { trackFunnelEvent } from "@/lib/analytics/events";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const allowedEvents = new Set([
@@ -9,6 +10,12 @@ const allowedEvents = new Set([
 ]);
 
 export async function POST(request: Request) {
+  const rateLimit = checkRateLimit(`analytics:${getClientIp(request)}`, 120, 60_000);
+
+  if (rateLimit.limited) {
+    return NextResponse.json({ ok: false }, { status: 429 });
+  }
+
   let body: { event_name?: unknown; metadata?: unknown; session_id?: unknown };
 
   try {

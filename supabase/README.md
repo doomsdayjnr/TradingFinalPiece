@@ -8,6 +8,8 @@ Use the Supabase SQL editor or Supabase CLI to run:
 
 ```text
 supabase/migrations/0001_initial_foundation.sql
+supabase/migrations/0002_license_token_display.sql
+supabase/migrations/0003_production_hardening.sql
 ```
 
 The migration creates:
@@ -74,3 +76,15 @@ SUPABASE_SERVICE_ROLE_KEY=
 ```
 
 Do not expose `SUPABASE_SERVICE_ROLE_KEY` in browser code.
+
+## Log Retention
+
+For launch, retention can be handled manually from the Supabase SQL editor:
+
+```sql
+select public.summarize_license_checks();
+select public.delete_license_checks_older_than(90);
+```
+
+Run the summary before deleting detailed logs. Monthly summaries are stored in
+`monthly_license_log_summaries`.
