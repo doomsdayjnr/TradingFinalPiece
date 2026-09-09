@@ -278,10 +278,10 @@ export default async function DashboardPage({
           <div className="status-list">
             {tickets.length === 0 && <p>No support tickets yet.</p>}
             {tickets.map((ticket) => (
-              <div key={ticket.id} className="status-row">
+              <Link key={ticket.id} className="status-row" href={`/dashboard/tickets/${ticket.id}`}>
                 <strong>{ticket.subject}</strong>
                 <span>{ticket.status.replaceAll("_", " ")} - {formatDate(ticket.created_at)}</span>
-              </div>
+              </Link>
             ))}
           </div>
         </article>

@@ -1102,6 +1102,107 @@ p {
   display: none;
 }
 
+.ticket-card {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.ticket-card strong {
+  color: var(--gold-2);
+  font-size: 15px;
+}
+
+.ticket-card span,
+.ticket-card time,
+.ticket-meta span,
+.ticket-message time,
+.ticket-message span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.ticket-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.ticket-meta span {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(244, 174, 20, 0.16);
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.24);
+  text-transform: capitalize;
+}
+
+.ticket-description {
+  margin-top: 14px;
+  padding: 12px;
+  border-left: 2px solid var(--gold);
+  color: #f6edd8;
+  background: rgba(244, 174, 20, 0.07);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.message-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.ticket-message {
+  display: grid;
+  gap: 7px;
+  width: min(720px, 100%);
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.ticket-message.is-own {
+  justify-self: end;
+  border-color: rgba(244, 174, 20, 0.28);
+  background: rgba(244, 174, 20, 0.08);
+}
+
+.ticket-message strong {
+  color: var(--gold-2);
+  font-size: 12px;
+}
+
+.ticket-message p {
+  color: #f6edd8;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.reply-form,
+.single-action-form,
+.status-form {
+  margin-top: 16px;
+}
+
+.single-action-form button {
+  min-height: 38px;
+  border: 1px solid rgba(244, 174, 20, 0.32);
+  padding: 0 14px;
+  color: #130d03;
+  background: linear-gradient(180deg, #ffe184, var(--gold) 52%, #b8740b);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
 @media (max-width: 900px) {
   .site-shell {
     width: 100%;
@@ -1136,7 +1237,8 @@ p {
   .footer,
   .portal-grid,
   .admin-account,
-  .admin-filter {
+  .admin-filter,
+  .ticket-meta {
     grid-template-columns: 1fr;
   }
 
