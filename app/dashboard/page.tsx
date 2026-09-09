@@ -179,7 +179,12 @@ export default async function DashboardPage({
             <DownloadCard platform="MT4" enabled={hasVerifiedMt4 || hasDemoMt4} reason={hasVerifiedMt4 ? "Live verified" : hasDemoMt4 ? "Demo active" : "Verify MT4 live account or start MT4 demo"} />
             <DownloadCard platform="MT5" enabled={hasVerifiedMt5 || hasDemoMt5} reason={hasVerifiedMt5 ? "Live verified" : hasDemoMt5 ? "Demo active" : "Verify MT5 live account or start MT5 demo"} />
           </div>
-          <p className="fine-print">Signed EA download URLs will be enabled in Phase 5 after the compiled EA files are uploaded to private storage.</p>
+          <ol className="install-steps">
+            <li>Download the EA that matches your verified or active demo platform.</li>
+            <li>Open MetaTrader and place the file inside the platform Experts folder.</li>
+            <li>Restart MetaTrader, then attach TFP Edge to the correct chart.</li>
+          </ol>
+          <p className="fine-print">Downloads use short-lived signed URLs. If a file is not available, upload the compiled EA binary to private Supabase Storage first.</p>
         </article>
 
         <article className="portal-panel">
@@ -270,7 +275,11 @@ function DownloadCard({ platform, enabled, reason }: { platform: "MT4" | "MT5"; 
     <div className={enabled ? "download-card is-enabled" : "download-card"}>
       <strong>{platform} EA</strong>
       <span>{reason}</span>
-      <button type="button" disabled={!enabled}>{enabled ? "Ready For Phase 5" : "Locked"}</button>
+      {enabled ? (
+        <a href={`/api/downloads/ea?platform=${platform}`}>Download {platform}</a>
+      ) : (
+        <button type="button" disabled>Locked</button>
+      )}
     </div>
   );
 }

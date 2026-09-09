@@ -37,6 +37,20 @@ For Phase 5, the app should:
 
 This prevents a normal authenticated user from browsing or guessing EA storage paths.
 
+Default Phase 5 storage paths:
+
+```text
+ea-downloads/tfp-edge/mt4/tfp-edge.ex4
+ea-downloads/tfp-edge/mt5/tfp-edge.ex5
+```
+
+You can override the object paths with:
+
+```text
+EA_MT4_STORAGE_PATH=
+EA_MT5_STORAGE_PATH=
+```
+
 ## First Admin User
 
 After creating the first admin account through Supabase Auth, promote it in SQL:
