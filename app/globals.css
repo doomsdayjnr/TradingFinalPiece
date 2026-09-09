@@ -943,6 +943,104 @@ p {
   border-color: rgba(76, 175, 73, 0.65);
 }
 
+.admin-filter {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px auto;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.admin-filter input,
+.admin-filter select,
+.admin-actions input {
+  min-height: 38px;
+  border: 1px solid rgba(244, 174, 20, 0.28);
+  padding: 9px 10px;
+  color: var(--text);
+  background: #050505;
+  font: inherit;
+}
+
+.admin-filter button,
+.admin-actions button {
+  min-height: 38px;
+  border: 1px solid rgba(244, 174, 20, 0.32);
+  padding: 0 14px;
+  color: #130d03;
+  background: linear-gradient(180deg, #ffe184, var(--gold) 52%, #b8740b);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.admin-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.admin-account {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) 140px minmax(320px, 1.4fr);
+  gap: 14px;
+  align-items: start;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.admin-account .eyebrow {
+  color: var(--gold-2);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-account h3 {
+  margin-top: 5px;
+  color: #fff3d4;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.admin-account p:not(.eyebrow) {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.admin-account > strong {
+  width: fit-content;
+  border: 1px solid rgba(244, 174, 20, 0.28);
+  padding: 8px 10px;
+  color: var(--gold-2);
+  background: rgba(244, 174, 20, 0.08);
+  font-size: 11px;
+  text-transform: capitalize;
+}
+
+.admin-actions {
+  display: grid;
+  gap: 9px;
+}
+
+.admin-actions form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.admin-actions form:nth-child(1) {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.admin-actions form:nth-child(1) input[name="account_id"],
+.admin-actions input[type="hidden"] {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .site-shell {
     width: 100%;
@@ -975,7 +1073,9 @@ p {
   .account-panels,
   .about-edge,
   .footer,
-  .portal-grid {
+  .portal-grid,
+  .admin-account,
+  .admin-filter {
     grid-template-columns: 1fr;
   }
 
@@ -1055,7 +1155,9 @@ p {
   .portal-header nav a,
   .download-grid,
   .form-pair,
-  .table-row {
+  .table-row,
+  .admin-actions form,
+  .admin-actions form:nth-child(1) {
     grid-template-columns: 1fr;
   }
 
