@@ -701,6 +701,248 @@ p {
   line-height: 1.6;
 }
 
+.auth-form,
+.portal-form {
+  display: grid;
+  gap: 14px;
+}
+
+.auth-form label,
+.portal-form label {
+  display: grid;
+  gap: 7px;
+  color: #f6edd8;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.auth-form input,
+.portal-form input,
+.portal-form select,
+.portal-form textarea,
+.inline-form select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid rgba(244, 174, 20, 0.32);
+  border-radius: 0;
+  padding: 10px 12px;
+  color: var(--text);
+  background: #050505;
+  font: inherit;
+}
+
+.portal-form textarea {
+  resize: vertical;
+}
+
+.primary-button,
+.portal-form button,
+.table-row button,
+.download-card button,
+.portal-header nav a {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(244, 174, 20, 0.32);
+  padding: 0 16px;
+  color: #130d03;
+  background: linear-gradient(180deg, #ffe184, var(--gold) 52%, #b8740b);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.auth-panel > .primary-button {
+  width: fit-content;
+  margin-top: 14px;
+}
+
+.auth-switch,
+.form-message,
+.portal-message,
+.fine-print {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.auth-switch a,
+.portal-header nav a {
+  color: var(--gold-2);
+}
+
+.form-message,
+.portal-message {
+  border: 1px solid rgba(244, 174, 20, 0.28);
+  padding: 11px 12px;
+  background: rgba(244, 174, 20, 0.08);
+}
+
+.portal-shell {
+  width: min(1120px, 100%);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 22px;
+  background: #050505;
+  border-inline: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.portal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(244, 174, 20, 0.2);
+}
+
+.portal-header .eyebrow {
+  color: var(--gold-2);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.portal-header h1 {
+  margin-top: 6px;
+  color: var(--gold-2);
+  font-size: clamp(30px, 5vw, 52px);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.portal-header p:not(.eyebrow) {
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.portal-header nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.portal-header nav a {
+  color: #130d03;
+}
+
+.portal-message {
+  margin-top: 18px;
+}
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.portal-panel {
+  margin-top: 16px;
+  padding: 18px;
+  border: 1px solid rgba(244, 174, 20, 0.18);
+  background: linear-gradient(180deg, #111, #090909);
+}
+
+.portal-grid .portal-panel {
+  margin-top: 0;
+}
+
+.portal-panel h2 {
+  color: #fff3d4;
+  font-size: 18px;
+  text-transform: uppercase;
+}
+
+.portal-panel > p {
+  margin: 8px 0 16px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.inline-form {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+
+.check-row {
+  grid-template-columns: 18px 1fr !important;
+  align-items: start;
+  text-transform: none !important;
+  line-height: 1.35;
+}
+
+.check-row input {
+  min-height: 18px;
+}
+
+.form-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.table-list,
+.status-list,
+.download-grid {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 1.2fr 0.6fr 1fr 1.6fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.table-row span,
+.status-row span,
+.download-card span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.table-row strong,
+.status-row strong,
+.download-card strong {
+  color: var(--gold-2);
+  text-transform: capitalize;
+}
+
+.status-row,
+.download-card {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.download-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.download-card button:disabled {
+  color: var(--muted);
+  background: #101010;
+  cursor: not-allowed;
+}
+
+.download-card.is-enabled {
+  border-color: rgba(76, 175, 73, 0.65);
+}
+
 @media (max-width: 900px) {
   .site-shell {
     width: 100%;
@@ -732,7 +974,8 @@ p {
 
   .account-panels,
   .about-edge,
-  .footer {
+  .footer,
+  .portal-grid {
     grid-template-columns: 1fr;
   }
 
@@ -793,6 +1036,26 @@ p {
   }
 
   .account-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .portal-shell {
+    padding: 16px;
+  }
+
+  .portal-header,
+  .inline-form {
+    display: grid;
+  }
+
+  .portal-header nav {
+    justify-content: stretch;
+  }
+
+  .portal-header nav a,
+  .download-grid,
+  .form-pair,
+  .table-row {
     grid-template-columns: 1fr;
   }
 
