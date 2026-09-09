@@ -47,7 +47,8 @@ Rules:
 - Demo access requires a matching active demo entitlement that has not expired.
 - The EA must send `MT4` or `MT5` as `platform_type`.
 - `account_type` may be `live`, `real`, or `demo`.
-- `license_token` is hashed before lookup. Raw tokens are never stored.
+- `license_token` is hashed before validation lookup.
+- MVP note: raw tokens are shown in the user portal so traders can paste them into the EA inputs.
 - Every validation attempt is written to `license_checks`.
 - Allowed responses include a 48-hour `grace_until` value for EA-side API outage handling.
 - Basic in-memory rate limiting applies per IP/account for launch protection.

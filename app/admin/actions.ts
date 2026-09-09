@@ -87,7 +87,7 @@ export async function approveAccount(formData: FormData) {
     redirect(`/admin?message=${encodeURIComponent(updateError?.message ?? "Could not approve account.")}`);
   }
 
-  const { error: entitlementError } = await admin.from("license_entitlements").insert({
+  const { data: entitlement, error: entitlementError } = await admin.from("license_entitlements").insert({
     user_id: updatedAccount.user_id,
     broker_account_id: updatedAccount.id,
     kind: "live",
@@ -95,10 +95,22 @@ export async function approveAccount(formData: FormData) {
     ea_product: "tfp-edge",
     status: "active",
     license_token_hash: licenseTokenHash
+  }).select("id").single();
+
+  if (entitlementError || !entitlement) {
+    redirect(`/admin?message=${encodeURIComponent(entitlementError.message)}`);
+  }
+
+  const { error: tokenDisplayError } = await admin.from("license_token_displays").insert({
+    user_id: updatedAccount.user_id,
+    license_entitlement_id: entitlement.id,
+    platform: updatedAccount.platform,
+    kind: "live",
+    token: licenseToken
   });
 
-  if (entitlementError) {
-    redirect(`/admin?message=${encodeURIComponent(entitlementError.message)}`);
+  if (tokenDisplayError) {
+    redirect(`/admin?message=${encodeURIComponent(tokenDisplayError.message)}`);
   }
 
   await auditLog(adminUser.id, "broker_account.approved", accountId, previousAccount, updatedAccount);

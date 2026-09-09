@@ -36,6 +36,13 @@ type TicketRow = {
   status: string;
   created_at: string;
 };
+type LicenseTokenRow = {
+  id: string;
+  platform: "MT4" | "MT5";
+  kind: string;
+  token: string;
+  created_at: string;
+};
 type QueryClient = {
   from: (table: string) => any;
 };
@@ -68,7 +75,7 @@ export default async function DashboardPage({
     redirect("/login");
   }
 
-  const [profileResult, brokerAccountsResult, demoLicensesResult, entitlementsResult, ticketsResult] = await Promise.all([
+  const [profileResult, brokerAccountsResult, demoLicensesResult, entitlementsResult, ticketsResult, tokenDisplaysResult] = await Promise.all([
     db.from("profiles").select("email, full_name, role").eq("id", userData.user.id).single(),
     db
       .from("broker_accounts")
@@ -77,7 +84,8 @@ export default async function DashboardPage({
       .order("submitted_at", { ascending: false }),
     db.from("demo_licenses").select("id, platform, status, starts_at, expires_at").order("created_at", { ascending: false }),
     db.from("license_entitlements").select("id, kind, platform, status, expires_at, broker_account_id").order("created_at", { ascending: false }),
-    db.from("support_tickets").select("id, category, subject, status, created_at").order("created_at", { ascending: false }).limit(8)
+    db.from("support_tickets").select("id, category, subject, status, created_at").order("created_at", { ascending: false }).limit(8),
+    db.from("license_token_displays").select("id, platform, kind, token, created_at").order("created_at", { ascending: false })
   ]);
   const params = await searchParams;
   const profile = profileResult.data;
@@ -85,6 +93,7 @@ export default async function DashboardPage({
   const demoLicenses = (demoLicensesResult.data ?? []) as DemoLicenseRow[];
   const entitlements = (entitlementsResult.data ?? []) as EntitlementRow[];
   const tickets = (ticketsResult.data ?? []) as TicketRow[];
+  const tokenDisplays = (tokenDisplaysResult.data ?? []) as LicenseTokenRow[];
   const hasVerifiedMt4 = brokerAccounts.some((account) => account.platform === "MT4" && account.verification_status === "verified");
   const hasVerifiedMt5 = brokerAccounts.some((account) => account.platform === "MT5" && account.verification_status === "verified");
   const hasDemoMt4 = demoLicenses.some((license) => license.platform === "MT4" && isDemoActive(license));
@@ -198,6 +207,17 @@ export default async function DashboardPage({
               </div>
             ))}
           </div>
+          {tokenDisplays.length > 0 && (
+            <div className="token-list">
+              <h3>EA License Tokens</h3>
+              {tokenDisplays.map((tokenDisplay) => (
+                <div className="token-row" key={tokenDisplay.id}>
+                  <span>{tokenDisplay.platform} {tokenDisplay.kind}</span>
+                  <code>{tokenDisplay.token}</code>
+                </div>
+              ))}
+            </div>
+          )}
         </article>
       </section>
 

@@ -118,7 +118,7 @@ export async function requestDemoLicense(formData: FormData) {
     redirect(`/dashboard?message=${encodeURIComponent(demoError?.message ?? "Could not create demo license.")}`);
   }
 
-  const { error: entitlementError } = await admin.from("license_entitlements").insert({
+  const { data: entitlement, error: entitlementError } = await admin.from("license_entitlements").insert({
     user_id: user.id,
     demo_license_id: demoLicense.id,
     kind: "demo",
@@ -127,14 +127,26 @@ export async function requestDemoLicense(formData: FormData) {
     status: "active",
     license_token_hash: tokenHash,
     expires_at: demoLicense.expires_at
-  });
+  }).select("id").single();
 
-  if (entitlementError) {
+  if (entitlementError || !entitlement) {
     redirect(`/dashboard?message=${encodeURIComponent(entitlementError.message)}`);
   }
 
+  const { error: tokenDisplayError } = await admin.from("license_token_displays").insert({
+    user_id: user.id,
+    license_entitlement_id: entitlement.id,
+    platform,
+    kind: "demo",
+    token
+  });
+
+  if (tokenDisplayError) {
+    redirect(`/dashboard?message=${encodeURIComponent(tokenDisplayError.message)}`);
+  }
+
   revalidatePath("/dashboard");
-  redirect("/dashboard?message=Demo license created. Save your license token securely when downloads are enabled.");
+  redirect("/dashboard?message=Demo license created. Your EA token is shown below.");
 }
 
 export async function createSupportTicket(formData: FormData) {
