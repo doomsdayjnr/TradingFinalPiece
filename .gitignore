@@ -12,3 +12,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+*.mq4
+*.mq5
+*.ex4
+*.ex5
+*.set

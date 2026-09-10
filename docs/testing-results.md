@@ -4,6 +4,10 @@ Test procedure: [Project Testing Flow](project-testing-flow.md).
 
 Current status: **Not run**. No end-to-end acceptance results are claimed.
 
+Preflight evidence from the 2026-09-10 EA integration is recorded separately in
+[Phase 7 Integration Verification](phase-7-integration-verification.md). It does
+not replace the per-case acceptance results below.
+
 ## Run Details
 
 | Field | Value |

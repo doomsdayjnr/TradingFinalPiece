@@ -35,6 +35,7 @@ type LicenseDecision = {
   status: string;
   message: string;
   grace_until?: string;
+  expires_at?: string | null;
   user_id?: string | null;
   broker_account_id?: string | null;
   demo_license_id?: string | null;
@@ -77,8 +78,9 @@ function hashToken(token: string) {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
-function graceUntil() {
-  return new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+function graceUntil(expiresAt: string | null = null) {
+  const limit = Date.now() + 48 * 60 * 60 * 1000;
+  return new Date(expiresAt ? Math.min(limit, Date.parse(expiresAt)) : limit).toISOString();
 }
 
 async function logLicenseCheck(
@@ -127,9 +129,12 @@ async function decideLiveAccess(
     .select("id, user_id, platform, verification_status, brokers(name)")
     .eq("account_number", payload.accountNumber)
     .eq("account_kind", "live")
-    .single();
+    .eq("platform", payload.platform)
+    .neq("verification_status", "removed_by_user")
+    .maybeSingle();
 
-  if (accountError || !account) {
+  if (accountError) throw accountError;
+  if (!account) {
     return {
       allowed: false,
       result: "denied_unknown_account",
@@ -185,10 +190,12 @@ async function decideLiveAccess(
     .eq("broker_account_id", account.id)
     .eq("platform", payload.platform)
     .eq("kind", "live")
+    .eq("ea_product", payload.eaProduct)
     .eq("license_token_hash", payload.licenseTokenHash)
-    .single();
+    .maybeSingle();
 
-  if (entitlementError || !entitlement) {
+  if (entitlementError) throw entitlementError;
+  if (!entitlement) {
     return {
       allowed: false,
       result: "denied_invalid_token",
@@ -199,12 +206,14 @@ async function decideLiveAccess(
     };
   }
 
-  if (entitlement.status !== "active") {
+  const expired = entitlement.expires_at !== null &&
+    (!Number.isFinite(Date.parse(entitlement.expires_at)) || Date.parse(entitlement.expires_at) <= Date.now());
+  if (expired || entitlement.status !== "active") {
     return {
       allowed: false,
-      result: entitlement.status === "expired" ? "denied_expired" : "denied_suspended",
-      status: entitlement.status,
-      message: `License is ${entitlement.status}.`,
+      result: expired || entitlement.status === "expired" ? "denied_expired" : "denied_suspended",
+      status: expired ? "expired" : entitlement.status,
+      message: `License is ${expired ? "expired" : entitlement.status}.`,
       user_id: account.user_id,
       broker_account_id: account.id,
       license_entitlement_id: entitlement.id
@@ -218,7 +227,8 @@ async function decideLiveAccess(
     result: "allowed",
     status: "active",
     message: "License active",
-    grace_until: graceUntil(),
+    grace_until: graceUntil(entitlement.expires_at),
+    expires_at: entitlement.expires_at,
     user_id: account.user_id,
     broker_account_id: account.id,
     license_entitlement_id: entitlement.id
@@ -238,10 +248,12 @@ async function decideDemoAccess(
     .select("id, user_id, demo_license_id, status, expires_at, demo_licenses(id, status, expires_at)")
     .eq("kind", "demo")
     .eq("platform", payload.platform)
+    .eq("ea_product", payload.eaProduct)
     .eq("license_token_hash", payload.licenseTokenHash)
-    .single();
+    .maybeSingle();
 
-  if (entitlementError || !entitlement) {
+  if (entitlementError) throw entitlementError;
+  if (!entitlement) {
     return {
       allowed: false,
       result: "denied_invalid_token",
@@ -250,8 +262,12 @@ async function decideDemoAccess(
     };
   }
 
-  const expiresAt = entitlement.expires_at ?? entitlement.demo_licenses?.expires_at;
-  const isExpired = expiresAt ? new Date(expiresAt).getTime() <= Date.now() : false;
+  // Both records constrain the trial; a later entitlement cannot extend it.
+  const expiryTimes = [entitlement.expires_at, entitlement.demo_licenses?.expires_at]
+    .map((value) => typeof value === "string" ? Date.parse(value) : NaN);
+  const validExpiry = expiryTimes.every(Number.isFinite);
+  const expiresAt = validExpiry ? new Date(Math.min(...expiryTimes)).toISOString() : null;
+  const isExpired = !expiresAt || Date.parse(expiresAt) <= Date.now();
 
   if (isExpired || entitlement.status === "expired" || entitlement.demo_licenses?.status === "expired") {
     return {
@@ -284,7 +300,8 @@ async function decideDemoAccess(
     result: "allowed",
     status: "active",
     message: "Demo license active",
-    grace_until: graceUntil(),
+    grace_until: graceUntil(expiresAt),
+    expires_at: expiresAt,
     user_id: entitlement.user_id,
     demo_license_id: entitlement.demo_license_id,
     license_entitlement_id: entitlement.id
@@ -292,11 +309,13 @@ async function decideDemoAccess(
 }
 
 export async function POST(request: Request) {
-  const db = createSupabaseAdminClient() as unknown as QueryClient;
   let body: ValidationPayload;
 
   try {
     body = await request.json();
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      throw new Error("Expected an object");
+    }
   } catch {
     return NextResponse.json({ allowed: false, status: "bad_request", message: "Invalid JSON payload." }, { status: 400 });
   }
@@ -309,6 +328,12 @@ export async function POST(request: Request) {
   const eaVersion = asString(body.ea_version);
   const licenseToken = asString(body.license_token);
   const logPayload = { accountNumber, accountKind, platform, brokerName, eaProduct, eaVersion };
+  let db: QueryClient;
+  try {
+    db = createSupabaseAdminClient() as unknown as QueryClient;
+  } catch {
+    return NextResponse.json({ allowed: false, status: "server_error", message: "License validation is temporarily unavailable." }, { status: 503 });
+  }
 
   const rateLimit = checkRateLimit(rateLimitKey(request, accountNumber), 60, 60_000);
 
@@ -329,12 +354,12 @@ export async function POST(request: Request) {
     });
   }
 
-  if (!accountNumber || !accountKind || !platform || !licenseToken) {
+  if (!/^\d{1,20}$/.test(accountNumber) || !accountKind || !platform || !/^[a-f0-9]{64}$/i.test(licenseToken) || eaProduct !== "tfp-edge") {
     const decision: LicenseDecision = {
       allowed: false,
       result: "denied_invalid_token",
       status: "invalid_request",
-      message: "account_number, account_type, platform_type and license_token are required."
+      message: "A valid account number, account type, platform, tfp-edge product and 64-character license token are required."
     };
     await logLicenseCheck(db, request, logPayload, decision);
     await trackFunnelEvent("license_validation_failed", { result: decision.result, platform, account_type: accountKind });
@@ -359,7 +384,9 @@ export async function POST(request: Request) {
       allowed: decision.allowed,
       status: decision.status,
       message: decision.message,
-      grace_until: decision.grace_until
+      grace_until: decision.grace_until,
+      expires_at: decision.expires_at,
+      server_time: new Date().toISOString()
     });
   } catch {
     const decision: LicenseDecision = {

@@ -138,7 +138,7 @@ must never be treated as a successful license check.
 | API-02 | Live account pending, rejected, suspended, revoked, or removed. | `allowed: false` for every state; appropriate status/message. |
 | API-03 | Unknown account number. | `allowed: false`, `status: not_found`. |
 | API-04 | Valid account with random token, another user's token, or demo token sent as live. | Denied; no cross-account access. |
-| API-05 | Live token with wrong platform or broker. | Denied with platform/broker mismatch. |
+| API-05 | Live token with wrong platform or broker. | Denied; wrong platform can return `not_found`, wrong broker returns `broker_mismatch`. |
 | API-06 | Active demo token on matching platform and a demo account. | Allowed; wrong platform and expired/suspended/revoked trial denied. |
 | API-07 | Expire each linked demo row separately, then both. | Neither an expired trial nor an expired entitlement grants access; inconsistencies do not bypass expiry. |
 | API-08 | Set a test live entitlement's expiry in the past while keeping status active. | Denied; compare with download behavior. Record any disagreement as a defect. |
@@ -151,10 +151,11 @@ must never be treated as a successful license check.
 ## 6. Actual MT4 And MT5 EAs (Phase 7)
 
 Run every row separately on MT4 and MT5 and record terminal/compiler versions,
-binary hash, Journal/Experts evidence, and attempted new orders. The repository
-currently provides `.mqh` helpers and integration instructions, not integrated
-EA source or compile results. Uploaded binaries alone do not establish that
-licensing is enforced. Mark blocked tests explicitly until integration is proven.
+binary hash, Journal/Experts evidence, and attempted new orders. The private EAs
+were integrated and compiled on 2026-09-10; see the
+[verification record](phase-7-integration-verification.md). The public repository
+contains only shared helpers and tests. Compilation and uploaded files alone do
+not prove runtime enforcement. Mark blocked tests explicitly until demonstrated.
 
 Use real terminal operation for WebRequest checks. For expiry/outage timing use
 a private test harness or controlled clock; do not wait 48 hours or alter the
@@ -167,14 +168,24 @@ production API. Capture attempted orders without executing live trades.
 | EA-03 | First launch without token, with invalid token, or while API is unreachable. | No new trades; useful message. |
 | EA-04 | Disable WebRequest, then enable it and allow the test domain. | Clear setup message; validation works after configuration is corrected. |
 | EA-05 | Test pending/rejected/suspended/revoked/unknown accounts and expired demos. | No new trades; correct denial explanation. |
-| EA-06 | After success, suspend/revoke online and force the next check. | Explicit denial clears permission; cached success/grace does not override it. Record normal recheck latency (helper currently uses one hour). |
+| EA-06 | After success, suspend/revoke online and force the next check. | Explicit denial clears permission; cached success/grace does not override it. Record normal recheck latency (helper now uses five minutes). |
 | EA-07 | After success, test network failure and HTTP 500/503 separately, before and after grace expires. | Previously validated identity can use bounded 48-hour outage grace; after it ends no new trades. First-run failure never grants grace. |
 | EA-08 | Restart terminal during an outage after prior success; test timezone differences. | Cache behavior matches the required local grace policy; UTC expiry is interpreted correctly and cannot be extended by restart. |
 | EA-09 | Change terminal account, token, broker, or platform while permission is cached. | Old live permission cannot authorize the new identity. Demo permission remains restricted to actual demo accounts. |
-| EA-10 | On an actual live-account harness, set the editable account-type input to demo and use a demo token. | No live access through demo licensing; actual terminal account mode governs eligibility. |
+| EA-10 | On an actual live-account harness, attempt to select demo mode and use a demo token; inspect the license inputs. | No editable account-type or API URL input exists. Demo token cannot unlock actual live mode. |
 | EA-11 | Let demo expiry occur during outage grace, including near the 14-day boundary. | Trial expiry is not extended by grace. |
 | EA-12 | Keep existing positions open in a demo terminal while API fails or license is denied. | Licensing does not force-close positions; protective management continues, while unauthorized new entries stop. |
 | EA-13 | Test a large MT5 account login and repeated failures with no incoming ticks. | Full account number is preserved; grace/retry timing remains bounded; alerts do not flood continuously. |
+
+EA-08 has a known implementation deviation: grace is memory-only, so terminal
+restart/reinitialization requires online validation. Do not mark persistent
+restart grace as Pass. Record the limitation and obtain explicit acceptance or
+implement signed persistent grants before claiming that requirement complete.
+
+For EA-12, the owner confirmed that closing manual trades across all account
+symbols is intentional. That existing behavior continues even while unlicensed.
+Check that licensing itself does not add forced closures, and that the EA's
+existing close/breakeven controls remain available.
 
 ## 7. Support Tickets (Phase 8)
 
