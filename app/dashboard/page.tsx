@@ -82,12 +82,13 @@ export default async function DashboardPage({
     db
       .from("broker_accounts")
       .select("id, account_number, platform, verification_status, rejection_reason, submitted_at, verified_at, rejected_at")
+      .eq("user_id", userData.user.id)
       .neq("verification_status", "removed_by_user")
       .order("submitted_at", { ascending: false }),
-    db.from("demo_licenses").select("id, platform, status, starts_at, expires_at").order("created_at", { ascending: false }),
-    db.from("license_entitlements").select("id, kind, platform, status, expires_at, broker_account_id").order("created_at", { ascending: false }),
-    db.from("support_tickets").select("id, category, subject, status, created_at").order("created_at", { ascending: false }).limit(8),
-    db.from("license_token_displays").select("id, platform, kind, token, created_at").order("created_at", { ascending: false })
+    db.from("demo_licenses").select("id, platform, status, starts_at, expires_at").eq("user_id", userData.user.id).order("created_at", { ascending: false }),
+    db.from("license_entitlements").select("id, kind, platform, status, expires_at, broker_account_id").eq("user_id", userData.user.id).order("created_at", { ascending: false }),
+    db.from("support_tickets").select("id, category, subject, status, created_at").eq("user_id", userData.user.id).order("created_at", { ascending: false }).limit(8),
+    db.from("license_token_displays").select("id, platform, kind, token, created_at").eq("user_id", userData.user.id).order("created_at", { ascending: false })
   ]);
   const params = await searchParams;
   const profile = profileResult.data;
@@ -195,7 +196,6 @@ export default async function DashboardPage({
             <li>Open MetaTrader and place the file inside the platform Experts folder.</li>
             <li>Restart MetaTrader, then attach TFP Edge to the correct chart.</li>
           </ol>
-          <p className="fine-print">Downloads use short-lived signed URLs. If a file is not available, upload the compiled EA binary to private Supabase Storage first.</p>
         </article>
 
         <article className="portal-panel">

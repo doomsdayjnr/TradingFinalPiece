@@ -248,7 +248,7 @@ export default async function Home() {
               <li>Use partner code <strong>{partnerCode}</strong> when creating your account.</li>
               <li>Submit your account for verification.</li>
             </ul>
-            <TrackedLink href={partnerLink} eventName="landing_xm_cta_clicked" className="green-btn" metadata={{ placement: "access_panel" }}>Register With Our Link</TrackedLink>
+            <TrackedLink href={partnerLink} target="_blank" eventName="landing_xm_cta_clicked" className="green-btn" metadata={{ placement: "access_panel" }}>Register With Our Link</TrackedLink>
           </div>
           <Image className="xm-laptop-art" src="/assets/xm_laptop.png" alt="XM account registration" width={520} height={290} />
         </article>

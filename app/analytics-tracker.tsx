@@ -6,6 +6,7 @@ type Props = {
   href: string;
   className?: string;
   metadata?: Record<string, unknown>;
+  target?: "_blank";
 };
 
 function getSessionId() {
@@ -20,7 +21,7 @@ function getSessionId() {
   return value;
 }
 
-export function TrackedLink({ eventName, children, href, className, metadata }: Props) {
+export function TrackedLink({ eventName, children, href, className, metadata, target }: Props) {
   async function trackClick() {
     try {
       await fetch("/api/analytics/track", {
@@ -44,7 +45,7 @@ export function TrackedLink({ eventName, children, href, className, metadata }: 
   }
 
   return (
-    <a className={className} href={href} onClick={trackClick}>
+    <a className={className} href={href} target={target} rel={target === "_blank" ? "noopener noreferrer" : undefined} onClick={trackClick}>
       {children}
     </a>
   );

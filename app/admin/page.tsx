@@ -70,7 +70,7 @@ export default async function AdminPage({ searchParams }: { searchParams?: Searc
   const search = params?.q?.trim() ?? "";
   let accountsQuery = db
     .from("broker_accounts")
-    .select("id, user_id, account_number, platform, verification_status, rejection_reason, admin_notes, submitted_at, verified_at, profiles(email, full_name), brokers(name, slug)")
+    .select("id, user_id, account_number, platform, verification_status, rejection_reason, admin_notes, submitted_at, verified_at, profiles!broker_accounts_user_id_fkey(email, full_name), brokers(name, slug)")
     .eq("account_kind", "live")
     .neq("verification_status", "removed_by_user")
     .order("submitted_at", { ascending: false });
@@ -131,7 +131,8 @@ export default async function AdminPage({ searchParams }: { searchParams?: Searc
           <button type="submit">Filter</button>
         </form>
         <div className="admin-list">
-          {accounts.length === 0 && <p>No accounts match this view.</p>}
+          {accountsResult.error && <p role="alert">The verification queue could not be loaded. Please refresh or try again shortly.</p>}
+          {!accountsResult.error && accounts.length === 0 && <p>No accounts match this view.</p>}
           {accounts.map((account) => (
             <article className="admin-account" key={account.id}>
               <div>

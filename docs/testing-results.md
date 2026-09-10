@@ -8,6 +8,11 @@ Preflight evidence from the 2026-09-10 EA integration is recorded separately in
 [Phase 7 Integration Verification](phase-7-integration-verification.md). It does
 not replace the per-case acceptance results below.
 
+The subsequent [downloads and verification fix](downloads-verification-isolation-fix.md)
+records browser checks for actual download hashes, pending-account approval,
+personal-portal scoping and ordinary-user data isolation. These targeted checks
+are separate from the planned full acceptance run.
+
 ## Run Details
 
 | Field | Value |

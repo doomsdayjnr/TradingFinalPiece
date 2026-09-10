@@ -84,7 +84,9 @@ export async function GET(request: Request) {
     .eq("status", "active");
 
   if (entitlementError) {
-    return NextResponse.json({ error: entitlementError.message }, { status: 500 });
+    const destination = new URL("/dashboard", request.url);
+    destination.searchParams.set("message", "We could not check your download access. Please try again shortly.");
+    return NextResponse.redirect(destination);
   }
 
   const hasAccess = (entitlements ?? []).some(isEntitlementActive);
@@ -99,13 +101,9 @@ export async function GET(request: Request) {
   });
 
   if (error || !data?.signedUrl) {
-    return NextResponse.json(
-      {
-        error: "EA file is not available yet. Upload the compiled file to Supabase Storage first.",
-        path: config.path
-      },
-      { status: 404 }
-    );
+    const destination = new URL("/dashboard", request.url);
+    destination.searchParams.set("message", `The ${platform} download is temporarily unavailable. Please try again later or contact support.`);
+    return NextResponse.redirect(destination);
   }
 
   await trackFunnelEvent("ea_download_started", { platform, path: config.path }, userData.user.id);
