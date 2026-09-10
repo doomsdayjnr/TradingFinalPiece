@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { LogoutButton } from "@/app/auth/logout-button";
+import { SubmitButton } from "@/app/submit-button";
 import { redirect } from "next/navigation";
 import { createSupportTicket, removeBrokerAccount, requestDemoLicense, submitBrokerAccount } from "./actions";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -110,7 +112,7 @@ export default async function DashboardPage({
         <nav>
           {profile?.role === "admin" && <Link href="/admin">Admin</Link>}
           <Link href="/">Homepage</Link>
-          <Link href="/logout">Logout</Link>
+          <LogoutButton />
         </nav>
       </header>
 
@@ -148,7 +150,7 @@ export default async function DashboardPage({
               <option value="MT4">MT4</option>
               <option value="MT5">MT5</option>
             </select>
-            <button type="submit">Start Demo Trial</button>
+            <SubmitButton pendingLabel="Starting Trial...">Start Demo Trial</SubmitButton>
           </form>
           <div className="status-list">
             {demoLicenses.length === 0 && <p>No demo licenses requested yet.</p>}

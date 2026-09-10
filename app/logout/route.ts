@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
-  const supabase = await createSupabaseServerClient();
-  await supabase.auth.signOut();
-  return NextResponse.redirect(new URL("/", request.url));
+  // GETs, including prefetches and link scanners, must never end a session.
+  return NextResponse.redirect(new URL("/dashboard", request.url));
 }

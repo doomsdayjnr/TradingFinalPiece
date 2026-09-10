@@ -18,7 +18,7 @@ async function requireUser() {
   const { data, error } = await supabase.auth.getUser();
 
   if (error || !data.user) {
-    redirect("/login");
+    redirect("/login?message=Your session has expired. Please sign in and try again.");
   }
 
   return data.user;
@@ -118,7 +118,10 @@ export async function requestDemoLicense(formData: FormData) {
     .single();
 
   if (demoError || !demoLicense) {
-    redirect(`/dashboard?message=${encodeURIComponent(demoError?.message ?? "Could not create demo license.")}`);
+    const message = demoError?.code === "23505"
+      ? "You have already requested a demo trial for this platform. Check your license status below."
+      : "Could not create the demo trial. Please try again or contact support.";
+    redirect(`/dashboard?message=${encodeURIComponent(message)}`);
   }
 
   const { data: entitlement, error: entitlementError } = await admin.from("license_entitlements").insert({
@@ -133,7 +136,7 @@ export async function requestDemoLicense(formData: FormData) {
   }).select("id").single();
 
   if (entitlementError || !entitlement) {
-    redirect(`/dashboard?message=${encodeURIComponent(entitlementError.message)}`);
+    redirect(`/dashboard?message=${encodeURIComponent(entitlementError?.message ?? "Could not create the demo entitlement. Please contact support.")}`);
   }
 
   const { error: tokenDisplayError } = await admin.from("license_token_displays").insert({

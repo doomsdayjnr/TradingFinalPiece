@@ -826,6 +826,16 @@ p {
   gap: 10px;
 }
 
+.portal-header nav form {
+  margin: 0;
+}
+
+.auth-form button:disabled,
+.portal-form button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
 .portal-header nav a {
   color: #130d03;
 }

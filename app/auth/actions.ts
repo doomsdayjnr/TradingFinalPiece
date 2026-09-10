@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { trackFunnelEvent } from "@/lib/analytics/events";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getSiteUrl } from "@/lib/auth/site-url";
 
 function getFormString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -33,6 +34,7 @@ export async function register(formData: FormData) {
     email,
     password,
     options: {
+      emailRedirectTo: `${getSiteUrl()}/auth/callback`,
       data: {
         full_name: fullName
       }
@@ -45,6 +47,9 @@ export async function register(formData: FormData) {
 
   await trackFunnelEvent("site_signup", { email }, data.user?.id ?? null);
 
+  if (!data.session) {
+    redirect("/register/check-email");
+  }
   redirect("/dashboard");
 }
 

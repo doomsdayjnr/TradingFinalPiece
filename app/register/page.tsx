@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { register } from "../auth/actions";
+import { SubmitButton } from "../submit-button";
 
 export default function RegisterPage({
   searchParams
@@ -25,7 +26,7 @@ export default function RegisterPage({
             Password
             <input name="password" type="password" autoComplete="new-password" minLength={6} required />
           </label>
-          <button className="primary-button" type="submit">Create Account</button>
+          <SubmitButton className="primary-button" pendingLabel="Creating Account...">Create Account</SubmitButton>
         </form>
         <AuthMessage searchParams={searchParams} />
         <p className="auth-switch">

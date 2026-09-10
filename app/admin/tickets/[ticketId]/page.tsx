@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoutButton } from "@/app/auth/logout-button";
 import { redirect } from "next/navigation";
 import { addAdminTicketReply, updateTicketStatus } from "@/app/dashboard/tickets/actions";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -58,7 +59,7 @@ export default async function AdminTicketDetailPage({ params, searchParams }: Pa
         <nav>
           <Link href="/admin/tickets">Ticket Queue</Link>
           <Link href="/admin">Verification</Link>
-          <Link href="/logout">Logout</Link>
+          <LogoutButton />
         </nav>
       </header>
 

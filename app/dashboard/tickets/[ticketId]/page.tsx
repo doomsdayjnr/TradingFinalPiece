@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoutButton } from "@/app/auth/logout-button";
 import { redirect } from "next/navigation";
 import { addUserTicketReply, closeOwnTicket } from "../actions";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -50,7 +51,7 @@ export default async function TicketPage({ params, searchParams }: PageProps) {
         </div>
         <nav>
           <Link href="/dashboard">Dashboard</Link>
-          <Link href="/logout">Logout</Link>
+          <LogoutButton />
         </nav>
       </header>
 

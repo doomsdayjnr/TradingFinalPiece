@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoutButton } from "@/app/auth/logout-button";
 import { redirect } from "next/navigation";
 import { approveAccount, rejectAccount, revokeAccount, suspendAccount } from "./actions";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -112,7 +113,7 @@ export default async function AdminPage({ searchParams }: { searchParams?: Searc
           <Link href="/admin/tickets">Tickets</Link>
           <Link href="/dashboard">User Portal</Link>
           <Link href="/">Homepage</Link>
-          <Link href="/logout">Logout</Link>
+          <LogoutButton />
         </nav>
       </header>
 
