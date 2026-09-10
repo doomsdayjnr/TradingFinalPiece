@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { TrackedLink } from "./analytics-tracker";
 import { CurrentYear } from "./current-year";
+import { WatchVideo } from "./watch-video";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const partnerLink = "https://affs.click/VJMdK";
 const partnerCode = "R99D9";
@@ -148,7 +150,14 @@ function Icon({ name }: { name: string }) {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  let signedIn = false;
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const supabase = await createSupabaseServerClient();
+    const { data } = await supabase.auth.getUser();
+    signedIn = Boolean(data.user);
+  }
+  const accessHref = signedIn ? "/dashboard" : "/register";
   return (
     <main className="site-shell">
       <header className="topbar">
@@ -164,7 +173,9 @@ export default function Home() {
           <a href="#about">About</a>
           <a href="#support">Support</a>
         </nav>
-        <Link className="login-btn" href="/login"><Icon name="user" /> Login</Link>
+        <Link className="login-btn" href={signedIn ? "/dashboard" : "/login"}>
+          <Icon name="user" /> {signedIn ? "Portal" : "Login"}
+        </Link>
       </header>
 
       <section className="hero" id="home">
@@ -187,8 +198,9 @@ export default function Home() {
               ))}
             </div>
             <div className="hero-actions">
-              <TrackedLink href={partnerLink} eventName="landing_xm_cta_clicked" className="gold-btn" metadata={{ placement: "hero" }}>Get Access To TFP Edge</TrackedLink>
-              <Link href="/register" className="dark-btn">Watch Video</Link>
+              {signedIn ? <Link href="/dashboard" className="gold-btn">Get Access To TFP Edge</Link>
+                : <TrackedLink href="/register" eventName="landing_register_clicked" className="gold-btn" metadata={{ placement: "hero" }}>Get Access To TFP Edge</TrackedLink>}
+              <WatchVideo />
             </div>
           </div>
         </div>
@@ -222,7 +234,7 @@ export default function Home() {
             />
           ))}
         </div>
-        <Link href="/register" className="center-gold-btn">Get Started Now</Link>
+        <Link href={accessHref} className="center-gold-btn">Get Started Now</Link>
       </section>
 
       <section className="account-panels" id="access">

@@ -1,11 +1,16 @@
 import Link from "next/link";
 import { login } from "../auth/actions";
+import { redirect } from "next/navigation";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export default function LoginPage({
+export default async function LoginPage({
   searchParams
 }: {
   searchParams?: Promise<{ message?: string }>;
 }) {
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase.auth.getUser();
+  if (data.user) redirect("/dashboard");
   return (
     <main className="auth-shell">
       <section className="auth-panel">
