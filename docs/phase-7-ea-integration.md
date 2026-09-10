@@ -3,7 +3,7 @@
 ## Current Status
 
 Both private TFP Edge source files have been integrated and compiled as version
-1.02. MT4 and MT5 each compiled with zero errors and zero warnings on 2026-09-10.
+1.03. MT4 and MT5 each compiled with zero errors and zero warnings on 2026-09-10.
 The original strategy sources remain outside the public repository, with backups
 in the private source folder's `originals-before-licensing` directory.
 
@@ -14,7 +14,7 @@ This is compile verification, not terminal acceptance testing. See
 
 - The only license input is `TFP_LicenseToken`, copied from the portal.
 - The compiled authority is
-  `https://www.tradingfinalpiece.com/api/v1/license/validate`.
+  `https://trading-final-piece.vercel.app/api/v1/license/validate`.
   The endpoint is not user-editable, so an arbitrary server cannot grant access.
 - Account number (including large MT5 logins), platform, actual live/demo mode,
   server, and company come from the terminal. Contest mode is denied.
@@ -90,8 +90,9 @@ and documentation belong in this public repository.
 1. Deploy the website branch containing these API updates with the existing
    Supabase configuration/migrations. The new EAs require `server_time` and
    `expires_at` in successful API responses.
-2. Connect `www.tradingfinalpiece.com` to that deployment and verify HTTPS.
-   The domain did not resolve from the development environment on 2026-09-10.
+2. Ensure `trading-final-piece.vercel.app` serves the latest integration branch.
+   On 2026-09-10 the Vercel site returned HTTP 404 for both `/api/health` and
+   `POST /api/v1/license/validate`; deployment of the API is still required.
    A healthy `/api/health` alone does not prove database connectivity.
 3. Validate an actual test license through the deployed API. Confirm allowed,
    denied, expiry and matching-platform behavior.
@@ -101,7 +102,7 @@ and documentation belong in this public repository.
    for the pass/fail summary. These scripts do not send requests or place trades.
    They were compiled here but have not been executed.
 5. Install each private compiled EA under the test terminal's `Experts` folder.
-   Enable WebRequest for `https://www.tradingfinalpiece.com`. Paste the appropriate
+   Enable WebRequest for `https://trading-final-piece.vercel.app`. Paste the appropriate
    portal token. Use isolated test accounts, not accounts with real positions.
 6. Run the EA cases in [Project Testing Flow](project-testing-flow.md), separately
    on MT4 and MT5. Include confirmation and auto-entry modes, account changes,
@@ -118,3 +119,16 @@ Do not use Strategy Tester as evidence of WebRequest behavior: the production
 helper denies that environment. Real connected-terminal tests are required.
 MetaQuotes documents the WebRequest restrictions and synchronous behavior in
 [the official reference](https://www.mql5.com/en/docs/network/webrequest).
+
+## Later Custom Domain
+
+The Vercel URL is deliberately pinned into version 1.03 for testing. Purchasing
+and linking `tradingfinalpiece.com` does not change already compiled EAs. Keep
+the Vercel hostname working for these builds, or update the shared helper,
+recompile both EAs, update WebRequest instructions and retest before switching
+downloads. Do not rely on a cross-domain redirect for the licensing POST.
+
+When replacing Supabase downloads, back up the currently stored binaries first,
+then replace the objects at the same paths. Do not delete the entire bucket or
+upload source files. The `builds-before-vercel-url` private folder contains the
+previous local builds, not necessarily the earlier Supabase files.

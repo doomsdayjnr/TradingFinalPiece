@@ -3,9 +3,9 @@
 
 input string TFP_LicenseToken = "";
 // Pin the authority: a user-controlled URL could always respond allowed.
-const string TFP_LicenseApiUrl = "https://www.tradingfinalpiece.com/api/v1/license/validate";
-const string TFP_PortalUrl = "https://www.tradingfinalpiece.com/dashboard";
-const string TFP_EaVersion = "1.02";
+const string TFP_LicenseApiUrl = "https://trading-final-piece.vercel.app/api/v1/license/validate";
+const string TFP_PortalUrl = "https://trading-final-piece.vercel.app/dashboard";
+const string TFP_EaVersion = "1.03";
 const int TFP_RecheckSeconds = 300;
 const int TFP_RetrySeconds = 60;
 bool TFP_LastAllowed=false, TFP_InGrace=false;
@@ -237,7 +237,7 @@ bool TFP_ValidateLicenseOnline()
    {
       bool grace=TFP_UseGrace();
       if(!grace && code==-1)
-         TFP_LastMessage="WebRequest failed. Enable https://www.tradingfinalpiece.com in Tools > Options > Expert Advisors and check internet access.";
+         TFP_LastMessage="WebRequest failed. Enable https://trading-final-piece.vercel.app in Tools > Options > Expert Advisors and check internet access.";
       return grace;
    }
    if(code!=200) { TFP_Deny("License request denied. Check your token and dashboard status."); return false; }
